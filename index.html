@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drug Delivery Challenge</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="app-container">
+
+        <!-- Menu Screen -->
+        <div id="menu-screen" class="screen">
+            <header>
+                <div class="header-icon">🏥</div>
+                <h1>Drug Delivery Challenge</h1>
+                <p>Save Lives Through Strategic Medicine</p>
+            </header>
+            <div class="player-stats-bar">
+                <div id="player-level-stat"></div>
+                <div id="scenarios-completed-stat"></div>
+                <div id="player-xp-stat"></div>
+                <button id="sound-toggle-btn">🔊 Sound On</button>
+            </div>
+            <div id="scenarios-list" class="scenarios-grid"></div>
+            <div id="achievements-section" class="card" style="text-align: center;">
+                <h2>🏆 Recent Achievements</h2>
+                <div id="achievements-display" class="achievements-list"></div>
+            </div>
+        </div>
+
+        <!-- Briefing Screen -->
+        <div id="briefing-screen" class="screen" style="display: none;">
+            <div class="briefing-content card">
+                <header style="text-align: center;">
+                    <h1 id="briefing-main-title">📋 Mission Briefing</h1>
+                    <h2 id="briefing-scenario-title"></h2>
+                </header>
+                <div class="briefing-details-grid">
+                    <div id="briefing-patient-info">
+                        <h3><span id="briefing-patient-emoji"></span> Patient Information</h3>
+                        <div id="patient-info-content" class="card"></div>
+                    </div>
+                    <div id="briefing-mission-objectives">
+                        <h3>🎯 Mission Objectives</h3>
+                        <div id="objectives-content" class="card"></div>
+                    </div>
+                </div>
+                <div id="briefing-tips-section" style="display:none;">
+                    <h3>💡 Tutorial Tips</h3>
+                    <ul id="briefing-tips-list" class="card"></ul>
+                </div>
+                <div class="briefing-actions">
+                    <button id="back-to-menu-btn">Back to Scenarios</button>
+                    <button id="begin-mission-btn">▶️ Begin Mission</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Playing Screen -->
+        <div id="playing-screen" class="screen" style="display: none;">
+            
+            <button id="toggle-patient-sidebar-btn" class="sidebar-toggle-btn left" aria-label="Toggle Patient Info">👨‍⚕️<span class="tooltiptext">Patient Info</span></button>
+            <aside id="patient-sidebar" class="sidebar left-sidebar collapsed">
+                <div class="sidebar-header">
+                    <h3>Patient Details</h3>
+                    <button class="close-sidebar-btn" data-sidebar="patient-sidebar">✕</button>
+                </div>
+                <div class="sidebar-content">
+                    <div class="patient-avatar-card card">
+                        <div id="patient-mood-display" class="patient-mood">😣</div>
+                        <h3 id="patient-name-display"></h3>
+                        <p id="patient-status-message"></p>
+                        <p id="patient-vitals" class="vitals-display"></p>
+                    </div>
+                    <div class="game-stats-grid">
+                        <div class="stat-item card">
+                            <div id="score-display">0</div>
+                            <div>Score</div>
+                            <div class="progress-bar-bg"><div id="score-progress" class="progress-bar"></div></div>
+                        </div>
+                        <div class="stat-item card">
+                            <div id="therapeutic-time-display">0.0h</div>
+                            <div>Therapeutic Time</div>
+                            <div class="progress-bar-bg"><div id="therapeutic-time-progress" class="progress-bar"></div></div>
+                        </div>
+                        <div class="stat-item card">
+                            <div id="drug-concentration-display">0.0</div>
+                            <div>Concentration (mg/L)</div>
+                            <div class="subtext">Current Level</div>
+                        </div>
+                        <div id="patient-status-indicator" class="stat-item card patient-status-subtherapeutic">
+                            <div id="patient-status-text">Subtherapeutic</div>
+                            <div>Current Zone</div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <button id="toggle-drug-sidebar-btn" class="sidebar-toggle-btn right" aria-label="Toggle Drug Arsenal">💉<span class="tooltiptext">Drug Arsenal</span></button>
+            <aside id="drug-sidebar" class="sidebar right-sidebar collapsed">
+                <div class="sidebar-header">
+                    <h3>Drug Arsenal</h3>
+                    <button class="close-sidebar-btn" data-sidebar="drug-sidebar">✕</button>
+                </div>
+                <div class="sidebar-content">
+                    <div class="drug-arsenal card">
+                        <div id="drug-types-list"></div>
+                    </div>
+                </div>
+            </aside>
+            
+            <div class="main-game-content">
+                <header class="game-header card">
+                    <div class="scenario-info">
+                        <h1 id="playing-scenario-title"></h1>
+                        <p id="playing-scenario-objective"></p>
+                    </div>
+                    <div class="game-stats-top">
+                        <span id="playing-player-level"></span>
+                        <span id="playing-budget"></span>
+                        <span id="playing-time-remaining"></span>
+                    </div>
+                </header>
+
+                <div class="graph-area card">
+                    <div class="graph-header">
+                        <h3>📈 Patient PK Profile</h3>
+                        <p id="graph-subtitle"></p>
+                    </div>
+                    <div class="canvas-container">
+                        <canvas id="game-canvas" width="800" height="400"></canvas>
+                    </div>
+                    <div id="graph-progress-indicator" class="graph-progress-indicator">
+                        <span id="graph-patient-mood-indicator" class="graph-patient-mood"></span>
+                        <div class="graph-score-bar-container">
+                            <div class="graph-score-bar-text">Score: <span id="graph-score-value">0</span> / <span id="graph-target-score-value">0</span></div>
+                            <div class="progress-bar-bg small"><div id="graph-score-progress" class="progress-bar"></div></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="graph-controls-panel card">
+                    <div class="selected-drug-info">
+                        Selected: <span id="selected-drug-icon-display" class="drug-icon-display"></span>
+                        <strong id="selected-drug-name-display">None - Select from 💉 Arsenal</strong>
+                    </div>
+                    <div class="dose-controls">
+                        <label for="dose-slider">Dose: <span id="current-dose-value">40</span> mg</label>
+                        <input type="range" id="dose-slider" min="10" max="100" value="40">
+                    </div>
+                    <div id="preset-doses-buttons" class="preset-doses"></div>
+                    <button id="inject-drug-btn" class="inject-button" disabled>💉 Select Drug & Start Simulation</button>
+                    <div class="smart-recommendations">
+                        <div id="next-dose-suggestion"></div>
+                        <div id="current-drug-risk"></div>
+                    </div>
+                </div>
+
+                <div class="simulation-controls-footer">
+                    <div class="main-sim-actions">
+                        <button id="toggle-simulation-btn">▶️ Start Simulation</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="achievement-notification" class="achievement-toast" style="display:none;"></div>
+            <div id="paused-notification" class="paused-toast" style="display:none;">
+                ⚠️ Simulation Paused - Click "Start Simulation" to begin treating the patient
+            </div>
+
+            <!-- Mobile Patient Panel -->
+            <div class="mobile-patient-panel" id="mobile-patient-panel">
+                <div class="mobile-patient-info">
+                    <div id="mobile-patient-mood" class="mobile-patient-mood">😣</div>
+                    <div class="mobile-patient-details">
+                        <h4 id="mobile-patient-name">Patient Name</h4>
+                        <p id="mobile-patient-status">Status</p>
+                    </div>
+                </div>
+                <div class="mobile-stats-grid">
+                    <div class="mobile-stat">
+                        <div id="mobile-score" class="mobile-stat-value">0</div>
+                        <div class="mobile-stat-label">Score</div>
+                    </div>
+                    <div class="mobile-stat">
+                        <div id="mobile-budget" class="mobile-stat-value">$500</div>
+                        <div class="mobile-stat-label">Budget</div>
+                    </div>
+                    <div class="mobile-stat">
+                        <div id="mobile-time" class="mobile-stat-value">8.0h</div>
+                        <div class="mobile-stat-label">Time</div>
+                    </div>
+                    <div class="mobile-stat">
+                        <div id="mobile-conc" class="mobile-stat-value">0.0</div>
+                        <div class="mobile-stat-label">Conc</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Desktop Patient Panel -->
+            <div class="desktop-patient-panel" id="desktop-patient-panel">
+                <div class="desktop-patient-info">
+                    <div class="desktop-patient-details">
+                        <div id="desktop-patient-mood" class="desktop-patient-mood">😣</div>
+                        <div class="desktop-patient-text">
+                            <h3 id="desktop-patient-name">Patient Name</h3>
+                            <p id="desktop-patient-status">Status</p>
+                            <p id="desktop-patient-vitals">HR: -- bpm | BP: --/--</p>
+                        </div>
+                    </div>
+                    <div class="desktop-stats-grid">
+                        <div class="desktop-stat">
+                            <div id="desktop-score" class="desktop-stat-value">0</div>
+                            <div class="desktop-stat-label">Score</div>
+                        </div>
+                        <div class="desktop-stat">
+                            <div id="desktop-budget" class="desktop-stat-value">$500</div>
+                            <div class="desktop-stat-label">Budget</div>
+                        </div>
+                        <div class="desktop-stat">
+                            <div id="desktop-time" class="desktop-stat-value">8.0h</div>
+                            <div class="desktop-stat-label">Time Remaining</div>
+                        </div>
+                        <div class="desktop-stat">
+                            <div id="desktop-conc" class="desktop-stat-value">0.0</div>
+                            <div class="desktop-stat-label">Concentration</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Completed Screen -->
+        <div id="completed-screen" class="screen" style="display: none;">
+            <div class="completion-content card">
+                <div id="completion-emoji" class="completion-emoji">🎉</div>
+                <h1 id="completion-title">Mission Accomplished!</h1>
+                <h2 id="completion-scenario-title"></h2>
+                <div class="completion-stats-grid">
+                    <div class="stat-item card">
+                        <div id="final-score">0</div>
+                        <div>Final Score</div>
+                        <small id="target-score-info"></small>
+                    </div>
+                    <div class="stat-item card">
+                        <div id="final-therapeutic-time">0.0h</div>
+                        <div>Therapeutic Time</div>
+                        <small id="total-time-info"></small>
+                    </div>
+                    <div class="stat-item card">
+                        <div id="final-injections">0</div>
+                        <div>Injections Given</div>
+                        <small>Efficiency Matters</small>
+                    </div>
+                    <div class="stat-item card">
+                        <div id="final-budget">0</div>
+                        <div>Budget Remaining</div>
+                        <small id="initial-budget-info"></small>
+                    </div>
+                </div>
+                <div id="completion-achievements" style="display:none;">
+                    <h3>🏆 Achievements Unlocked</h3>
+                    <div id="unlocked-achievements-list" class="achievements-list"></div>
+                </div>
+                <div class="completion-actions">
+                    <button id="retry-mission-btn">🔄 Retry Mission</button>
+                    <button id="back-to-menu-completed-btn">🏠 Back to Menu</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
